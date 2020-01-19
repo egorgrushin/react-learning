@@ -1,0 +1,10 @@
+@import '../../mixins';
+
+.wrapper {
+	@include fill();
+}
+
+.spinnerWrapper {
+	display: flex;
+	justify-content: center;
+}

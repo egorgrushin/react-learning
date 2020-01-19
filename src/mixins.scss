@@ -1,0 +1,19 @@
+@mixin full() {
+	display: flex;
+	flex-flow: column nowrap;
+	flex: 1 0 auto;
+}
+
+@mixin fill() {
+	display: flex;
+	flex-flow: column nowrap;
+	flex: 1 1 auto;
+	overflow-y: auto;
+}
+
+@mixin static() {
+	display: flex;
+	flex-flow: column nowrap;
+	flex: 0 0 auto;
+}
+

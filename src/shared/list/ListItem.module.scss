@@ -1,0 +1,18 @@
+
+.item {
+	padding: 5px 10px;
+	border-left: 1px solid transparent;
+	
+	&.selectable {
+		&:hover, &.active {
+			cursor: pointer;
+			background: #eee;
+			border-left-color: #9a4;
+		}
+	}
+	
+	
+	&:last-child {
+		margin-bottom: 0;
+	}
+}
