@@ -1,27 +1,22 @@
 import React from 'react';
 import styles from './Textbox.module.scss';
+import { ITextboxProps } from './Textbox.types';
+import classNames from 'classnames';
 
-export const Textbox = ({ value, onChange, className, placeholder, onEnter }: {
-	className?: string,
-	placeholder?: string,
-	value?: string,
-	onChange?: (value: string) => void,
-	onEnter?: (value: string) => void,
-}) => {
-	// const [thisValue, setThisValue] = useState(value);
-	const onKeyDownFn = (event: any) => {
+export const Textbox: React.FC<ITextboxProps> = ({ value, onChange, className, placeholder, onEnter }) => {
+	const onKeyDownFn = (event: any): void => {
 		if (event.key === 'Enter') {
 			onEnter?.(event.target.value);
 		}
 	};
 
-	const onChangeFn = (event: any) => {
+	const onChangeFn = (event: any): void => {
 		const newValue = event.target.value;
 		onChange?.(newValue);
 	};
 
 	return (
-		<div {...{ className: [className, styles.wrapper].join(' ') }}>
+		<div {...{ className: classNames(className, styles.wrapper) }}>
 			<input {...{
 				type: 'text',
 				value: value,

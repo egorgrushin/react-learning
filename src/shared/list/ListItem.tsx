@@ -1,21 +1,15 @@
 import React from 'react';
-import { IListOptions } from './List.types';
 import styles from './ListItem.module.scss';
+import { IListItemProps } from './ListItem.types';
+import classNames from 'classnames';
 
-export const ListItem = ({ item, options, isSelected, onClick, template }: {
-	item: any,
-	options: IListOptions,
-	isSelected?: boolean,
-	onClick?: () => void,
-	template?: (item: any) => void,
-}) => {
-	const text = item[options.displayProp];
+export const ListItem: React.FC<IListItemProps> = ({ item, options, isSelected, onClick, itemTemplate }) => {
 	const activeClassName = isSelected ? styles.active : '';
 	const selectableClassName = options.selectable ? styles.selectable : '';
 	return <div {...{
-		className: [styles.item, activeClassName, selectableClassName].join(' '),
+		className: classNames(styles.item, activeClassName, selectableClassName),
 		onClick,
 	}}>
-		{template ? template(item) : text}
+		{itemTemplate(item)}
 	</div>;
 };

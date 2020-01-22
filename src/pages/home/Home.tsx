@@ -9,14 +9,13 @@ import { IListOptions } from '../../shared/list/List.types';
 import { Cart } from './cart/Cart';
 import { IBook } from './books.types';
 
-export const Home = () => {
+export const Home: React.FC<{}> = () => {
 	const [textboxValue, setTextboxValue] = useState('');
 	const [filter, setFilter] = useState('');
 	const [selected, setSelected] = useState<Id[]>([]);
 	const [selectedBooks, setSelectedBooks] = useState<IBook[]>([]);
 	const [books, loadingState, load, loadMore] = useEntitiesLoader(fetchBooks);
 	const listOptions: Partial<IListOptions> = {
-		displayProp: 'title',
 		selectable: true,
 		multi: true,
 	};
@@ -24,35 +23,47 @@ export const Home = () => {
 		load(filter);
 	}, []);
 
-	const applyFilter = (newFilter: any) => {
+	const applyFilter = (newFilter: any): void => {
 		setFilter(newFilter);
 		load(newFilter);
 	};
 
-	const clearFilter = () => {
+	const clearFilter = (): void => {
 		const newValue = '';
 		if (filter === newValue) return;
 		setTextboxValue(newValue);
 		applyFilter(newValue);
 	};
 
-	const loadMoreFn = () => {
+	const loadMoreFn = (): void => {
 		loadMore(filter);
 	};
 
-	const getNewSelectedBooks = (selectedBooks: IBook[], item: IBook, value: boolean) => {
+	const getNewSelectedBooks = (
+		selectedBooks: IBook[],
+		item: IBook,
+		value: boolean,
+	): IBook[] => {
 		if (value) return selectedBooks.concat([item]);
 		return selectedBooks.filter((book) => book.id !== item.id);
 	};
 
-	const onSelectedChange = (newSelected: Id[], item: IBook, value: boolean) => {
+	const onSelectedChange = (
+		newSelected: Id[],
+		item: IBook,
+		value: boolean,
+	): void => {
 		// FIXME(yrgrushi): find a better way to calculate selected books
 		setSelected(newSelected);
-		const newSelectedBooks = getNewSelectedBooks(selectedBooks, item, value);
+		const newSelectedBooks = getNewSelectedBooks(
+			selectedBooks,
+			item,
+			value,
+		);
 		setSelectedBooks(newSelectedBooks);
 	};
 
-	const onCartClear = () => {
+	const onCartClear = (): void => {
 		// FIXME(yrgrushi): find a better way to calculate selected books
 		setSelected([]);
 		setSelectedBooks([]);
@@ -88,6 +99,7 @@ export const Home = () => {
 				<div {...{ className: styles.listWrapper }}>
 					<List {...{
 						items: books,
+						itemTemplate: (item: IBook): string => item.title,
 						options: listOptions,
 						loadingState,
 						selected,
