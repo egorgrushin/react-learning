@@ -1,9 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { IDictionary, ILoadingState } from '../core.types';
+import { ILoadingState } from '../core.types';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { MD5 } from 'object-hash';
 import { map, switchMap } from 'rxjs/operators';
 import { affectState, IAffectStateSetterArg } from './affectState';
+import { useDispatch, useSelector } from 'react-redux';
+import { IAppState } from '../store';
+import { IPages } from '../domains/entiites/entities.types';
+import { AddListAction, ReplaceList } from '../domains/entiites/entities.actions';
 
 const getKeyFromObject = <T>(value?: T): string => MD5(value);
 
@@ -25,10 +29,11 @@ export const useEntitiesLoader = <T, F = any>(
 	// (yrgrushi): paginator instance must depends filterObj in order to reset last emitted 'next' value
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	const paginator = useMemo(() => new BehaviorSubject<boolean>(false), [filterObj]);
-	const [pages, setPages] = useState<IDictionary<T[]>>({});
+	const pages = useSelector<IAppState, IPages<T>>((state) => state.entities);
+	const dispatch = useDispatch();
 
 	const key = getKeyFromObject<F>(filterObj);
-	const page = pages[key];
+	const page: T[] = pages[key];
 
 	const pageRef = useRef(page);
 	pageRef.current = page;
@@ -54,18 +59,16 @@ export const useEntitiesLoader = <T, F = any>(
 
 	useEffect(() => {
 		const sub = setter$.subscribe((pagePatch) => {
-			setPages((prevPages) => {
-				// FIXME(yrgrushi): refactor this shit
-				let newEntities = pagePatch.entities || [];
-				if (pagePatch.next === false) return { ...prevPages, [key]: newEntities };
-				newEntities = (prevPages[key] || []).concat(newEntities);
-				return { ...prevPages, [key]: newEntities };
-			});
+			const entities = pagePatch.entities || [];
+			const action = pagePatch.next
+				? AddListAction<T>(entities, key)
+				: ReplaceList<T>(entities, key);
+			dispatch(action);
 		});
 		return (): void => sub.unsubscribe();
 		// (yrgrushi:) setter$ depends on key, so it is not necessary to recreate this effect on key change
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [setPages, setter$]);
+	}, [setter$]);
 
 	return [
 		page,

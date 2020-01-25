@@ -1,8 +1,14 @@
-import { createStore } from 'redux';
+import { combineReducers, createStore } from 'redux';
+import { IPages } from './domains/entiites/entities.types';
+import { reducer as entitiesReducer } from './domains/entiites/entities.reducer';
 
-export interface IAppState {}
+export interface IAppState {
+	entities: IPages<any>;
+}
 
-const rootReducer = (state: IAppState = {}, action: any) => state;
+const rootReducer = combineReducers<IAppState>({
+	entities: entitiesReducer,
+});
 
 export const store = createStore(
 	rootReducer,
