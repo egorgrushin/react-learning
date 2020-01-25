@@ -6,7 +6,7 @@ export const useObservable = <T>(observable: Observable<T>, initialValue?: T): [
 
 	useEffect(() => {
 		const sub = observable.subscribe(setState);
-		return () => sub.unsubscribe();
+		return (): void => sub.unsubscribe();
 	}, [observable, setState]);
 
 	return [state];

@@ -1,53 +1,60 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { List } from '../../shared/list/List';
 import styles from './Home.module.scss';
 import { Textbox } from '../../shared/textbox/Textbox';
-import { useEntitiesLoader } from '../../helpers/useEntitiesLoader';
 import { fetchBooks } from './books.api';
 import { Id } from '../../core.types';
 import { IListOptions } from '../../shared/list/List.types';
 import { Cart } from './cart/Cart';
 import { IBook } from './books.types';
 import { useObservable } from '../../helpers/useObservable';
-import { Subject } from 'rxjs';
+import { from, Observable, Subject } from 'rxjs';
+import { useEntitiesLoader } from '../../helpers/useEntitiesLoader';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 const INITIAL_FILTER_VALUE = '';
 
+const LIST_OPTIONS: Partial<IListOptions> = {
+	selectable: true,
+	multi: true,
+};
+
 const filter$ = new Subject<string>();
 
+const books$Factory = (
+	value: string | undefined,
+	fromIndex: number,
+	toIndex: number,
+): Observable<IBook[]> => from(fetchBooks(value, fromIndex, toIndex));
+
 const debouncedFilter$ = filter$.pipe(
-	debounceTime(300),
+	debounceTime(500),
 	distinctUntilChanged(),
 );
 
-export const Home: React.FC<{}> = () => {
+export const Home: React.FC = () => {
 	const [selected, setSelected] = useState<Id[]>([]);
 	const [selectedBooks, setSelectedBooks] = useState<IBook[]>([]);
-	const [books, loadingState, load, loadMore] = useEntitiesLoader(fetchBooks);
-
 	const [filterInputValue] = useObservable(filter$, INITIAL_FILTER_VALUE);
-	const [filter] = useObservable(debouncedFilter$, INITIAL_FILTER_VALUE);
+	const [filterObj] = useObservable(debouncedFilter$, filterInputValue);
 
-	const listOptions: Partial<IListOptions> = {
-		selectable: true,
-		multi: true,
-	};
-
-	useEffect(() => {
-		load(filter);
-	}, [filter]);
+	const [books, loadingState, paginator] = useEntitiesLoader(filterObj, books$Factory, 5);
 
 	const applyFilter = (newFilter: string): void => {
 		filter$.next(newFilter);
 	};
 
+	// FIXME(yrgrushi): there is a bug - it doesn't clear the filterObj immediately
 	const clearFilter = (): void => {
 		filter$.next(INITIAL_FILTER_VALUE);
 	};
 
 	const loadMoreFn = (): void => {
-		loadMore(filter);
+		paginator.next(true);
+	};
+
+	const refreshFn = (): void => {
+		paginator.next(false);
 	};
 
 	const getNewSelectedBooks = (
@@ -104,20 +111,25 @@ export const Home: React.FC<{}> = () => {
 							className: styles.button,
 						}}>Load more
 						</button>
+						<button {...{
+							onClick: refreshFn,
+							disabled: loadingState.isLoading,
+							className: styles.button,
+						}}>Refresh
+						</button>
 					</div>
 				</div>
-				<div {...{ className: styles.listWrapper }}>
-					<List {...{
-						items: books,
-						itemTemplate: (item: IBook): string => item.title,
-						options: listOptions,
-						loadingState,
-						selected,
-						onSelectedChange,
-					}}/>
-				</div>
+				<List {...{
+					items: books,
+					itemTemplate: (item: IBook): string => item.title,
+					options: LIST_OPTIONS,
+					loadingState,
+					selected,
+					onSelectedChange,
+					className: styles.listWrapper,
+				}}/>
 			</div>
-			<div {...{ className: styles.form }}>
+			<div {...{ className: styles.right }}>
 				<Cart {...{
 					items: selectedBooks,
 					clear: onCartClear,

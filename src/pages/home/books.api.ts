@@ -9,6 +9,12 @@ export const fetchBooks = async (
 	from: number = 0,
 	to: number = from + PAGE_SIZE,
 ): Promise<IBook[]> => {
-	const filteredBooks: IBook[] = API_BOOKS.filter((book: IBook) => book.title.includes(title)).slice(from, to);
+	title = title.toLowerCase().trim();
+	const filteredBooks: IBook[] = API_BOOKS.filter((book: IBook) => book
+		.title
+		.toLowerCase()
+		.trim()
+		.includes(title))
+		.slice(from, to);
 	return fakeRequest(filteredBooks);
 };
