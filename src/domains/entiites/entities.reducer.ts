@@ -1,8 +1,8 @@
 import { IPages } from './entities.types';
 import { Actions } from './entities.actions';
-import { AnyAction } from 'redux';
+import { IActionPayload } from '../../store.types';
 
-export const reducer = <T>(state: IPages<T> = {}, action: AnyAction): IPages<T> => {
+export const reducer = <T>(state: IPages<T> = {}, action: IActionPayload): IPages<T> => {
 	switch (action.type) {
 		case Actions.AddList: {
 			const { entities, key } = action.payload;
