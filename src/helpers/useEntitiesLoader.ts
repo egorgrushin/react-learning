@@ -16,10 +16,12 @@ interface IEntitiesLoaderPagePatch<T> {
 	next: boolean;
 }
 
+const DEFAULT_PAGE_SIZE = 50;
+
 export const useEntitiesLoader = <T, F = any>(
 	filterObj: F | undefined,
 	dataSource$Factory: (value: F | undefined, from: number, to: number) => Observable<T[]>,
-	pageSize: number = 50,
+	pageSize: number = DEFAULT_PAGE_SIZE,
 ): [
 	T[] | undefined,
 	ILoadingState,
