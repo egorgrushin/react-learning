@@ -1,0 +1,44 @@
+@import '../../mixins';
+
+.wrapper {
+	@include full();
+	max-height: 100%;
+	flex-flow: row nowrap;
+}
+
+.tools {
+	@include static();
+	margin-bottom: 10px;
+}
+
+.buttons {
+	@include static();
+	flex-flow: row nowrap;
+}
+
+.button {
+	margin-right: 10px;
+}
+
+.books {
+	@include full();
+	flex: 1 1 50%;
+	margin-right: 10px;
+	max-height: 100%;
+	padding-right: 10px;
+	border-right: 1px solid #eee;
+}
+
+.form {
+	flex: 1 1 50%;
+}
+
+.filter {
+	margin-bottom: 10px;
+}
+
+.listWrapper {
+	@include fill();
+	border-top: 1px solid #eee;
+	padding-top: 10px;
+}
