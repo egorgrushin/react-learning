@@ -8,31 +8,42 @@ import { Id } from '../../core.types';
 import { IListOptions } from '../../shared/list/List.types';
 import { Cart } from './cart/Cart';
 import { IBook } from './books.types';
+import { useObservable } from '../../helpers/useObservable';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+
+const INITIAL_FILTER_VALUE = '';
+
+const filter$ = new Subject<string>();
+
+const debouncedFilter$ = filter$.pipe(
+	debounceTime(300),
+	distinctUntilChanged(),
+);
 
 export const Home: React.FC<{}> = () => {
-	const [textboxValue, setTextboxValue] = useState('');
-	const [filter, setFilter] = useState('');
 	const [selected, setSelected] = useState<Id[]>([]);
 	const [selectedBooks, setSelectedBooks] = useState<IBook[]>([]);
 	const [books, loadingState, load, loadMore] = useEntitiesLoader(fetchBooks);
+
+	const [filterInputValue] = useObservable(filter$, INITIAL_FILTER_VALUE);
+	const [filter] = useObservable(debouncedFilter$, INITIAL_FILTER_VALUE);
+
 	const listOptions: Partial<IListOptions> = {
 		selectable: true,
 		multi: true,
 	};
+
 	useEffect(() => {
 		load(filter);
-	}, []);
+	}, [filter]);
 
-	const applyFilter = (newFilter: any): void => {
-		setFilter(newFilter);
-		load(newFilter);
+	const applyFilter = (newFilter: string): void => {
+		filter$.next(newFilter);
 	};
 
 	const clearFilter = (): void => {
-		const newValue = '';
-		if (filter === newValue) return;
-		setTextboxValue(newValue);
-		applyFilter(newValue);
+		filter$.next(INITIAL_FILTER_VALUE);
 	};
 
 	const loadMoreFn = (): void => {
@@ -75,9 +86,8 @@ export const Home: React.FC<{}> = () => {
 				<h2>Books: </h2>
 				<div {...{ className: styles.tools }}>
 					<Textbox {...{
-						value: textboxValue,
-						onEnter: applyFilter,
-						onChange: setTextboxValue,
+						value: filterInputValue,
+						onChange: applyFilter,
 						placeholder: 'Enter any text and press the enter',
 						className: styles.filter,
 					}}/>
@@ -108,7 +118,10 @@ export const Home: React.FC<{}> = () => {
 				</div>
 			</div>
 			<div {...{ className: styles.form }}>
-				<Cart items={selectedBooks} clear={onCartClear.bind(null)}/>
+				<Cart {...{
+					items: selectedBooks,
+					clear: onCartClear,
+				}}/>
 			</div>
 		</div>
 	);
