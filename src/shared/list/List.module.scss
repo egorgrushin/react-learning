@@ -1,0 +1,9 @@
+@import '../../mixins';
+
+.wrapper {
+	@include fill();
+}
+
+.spinnerWrapper {
+	align-self: center;
+}
