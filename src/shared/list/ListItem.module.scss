@@ -4,9 +4,13 @@
 	border-left: 1px solid transparent;
 	
 	&.selectable {
+		user-select: none;
 		&:hover, &.active {
 			cursor: pointer;
 			background: #eee;
+		}
+		
+		&.active {
 			border-left-color: #9a4;
 		}
 	}
