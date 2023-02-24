@@ -1,8 +1,9 @@
 import React from 'react';
 import { ICartProps, IWithPrice } from './cart.types';
 import styles from './Cart.module.scss';
+import classNames from 'classnames';
 
-export const Cart: React.FC<ICartProps> = ({ items = [], clear }) => {
+export const Cart: React.FC<ICartProps> = ({ items = [], clear, className }) => {
 
 	const getTotalPrice = (): number => items.reduce((
 		memo: number,
@@ -10,7 +11,7 @@ export const Cart: React.FC<ICartProps> = ({ items = [], clear }) => {
 	) => memo + item.price, 0);
 
 	return (
-		<div {...{ className: styles.wrapper }}>
+		<div {...{ className: classNames(styles.wrapper, className) }}>
 			<span>Total count: <strong>{items.length}</strong>, Total price: <strong>{getTotalPrice()}</strong></span>
 			<button {...{
 				onClick: clear,

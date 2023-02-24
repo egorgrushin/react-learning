@@ -5,6 +5,7 @@ import { defaultsDeepSafe, getSelectedMap } from '../../helpers/objects';
 import styles from './List.module.scss';
 import { Id } from '../../core.types';
 import { Spinner } from '../spinner/Spinner';
+import classNames from 'classnames';
 
 export const List: React.FC<IListProps> = ({
 	items = [],
@@ -13,6 +14,7 @@ export const List: React.FC<IListProps> = ({
 	selected = [],
 	onSelectedChange,
 	itemTemplate,
+	className,
 }) => {
 	const resultOptions = defaultsDeepSafe<IListOptions>(options, { keyProp: 'id' });
 	const getIsSelected = (key: Id): boolean => {
@@ -38,8 +40,8 @@ export const List: React.FC<IListProps> = ({
 	};
 
 	return (
-		<div {...{ className: styles.wrapper }}>
-			{items.map((item) => {
+		<div {...{ className: classNames(styles.wrapper, className) }}>
+			{items?.map((item) => {
 				const key = item[resultOptions.keyProp];
 				return (
 					<ListItem {...{
