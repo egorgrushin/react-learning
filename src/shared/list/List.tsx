@@ -8,7 +8,7 @@ import { Spinner } from '../spinner/Spinner';
 import classNames from 'classnames';
 
 export const List: React.FC<IListProps> = ({
-	items = [],
+	items,
 	options,
 	loadingState,
 	selected = [],
@@ -41,19 +41,24 @@ export const List: React.FC<IListProps> = ({
 
 	return (
 		<div {...{ className: classNames(styles.wrapper, className) }}>
-			{items?.map((item) => {
-				const key = item[resultOptions.keyProp];
-				return (
-					<ListItem {...{
-						item,
-						options: resultOptions,
-						key,
-						isSelected: getIsSelected(key),
-						onClick: onItemClick.bind(null, key, item),
-						itemTemplate,
-					}}/>
-				);
-			})}
+			{
+				items?.map((item) => {
+					const key = item[resultOptions.keyProp];
+					return (
+						<ListItem {...{
+							item,
+							options: resultOptions,
+							key,
+							isSelected: getIsSelected(key),
+							onClick: onItemClick.bind(null, key, item),
+							itemTemplate,
+						}}/>
+					);
+				}) ??
+				<React.Fragment>
+					No items
+				</React.Fragment>
+			}
 			{loadingState?.isLoading && (
 				<Spinner {...{ className: styles.spinnerWrapper }}/>
 			)}
